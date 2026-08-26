@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "design-automation-platform"
+version = "0.1.0"
+description = "Interview-preparation scaffold for a Solution Design Document automation platform"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "boto3>=1.35",
+    "faiss-cpu>=1.8",
+    "numpy>=1.26",
+    "rank-bm25>=0.2.2",
+    "sentence-transformers>=3.0",
+]
+
+[project.scripts]
+inspect-chunks = "design_automation.ingestion.inspect:main"
+inspect-retrieval = "design_automation.retrieval.inspect:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
