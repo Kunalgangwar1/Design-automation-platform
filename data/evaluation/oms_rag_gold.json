@@ -1,0 +1,277 @@
+{
+  "dataset_version": 1,
+  "corpus": "dummy-oms-day10",
+  "description": "Manually curated retrieval and generation ground truth for the existing fictional OMS corpus.",
+  "cases": [
+    {
+      "id": "gateway-timeout-reconciliation",
+      "query": "What should happen when the external financial provider does not respond during a refund?",
+      "category": "semantic_paraphrase",
+      "relevant_chunk_ids": [
+        "doc-58fec8cbd5fe-chunk-0005",
+        "doc-e14e6a30041c-chunk-0004",
+        "doc-41010a673bbe-chunk-0002"
+      ],
+      "notes": "Combines gateway ambiguity, idempotent lookup, and the reusable cancellation failure pattern.",
+      "expected_facts": [
+        {
+          "statement": "A gateway timeout is ambiguous and must be reconciled using the original idempotency key rather than treated as confirmed success.",
+          "match_any": [
+            ["timeout", "ambiguous", "idempotency key"],
+            ["timeout", "pending", "original idempotency key"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "identifier-idempotency-conflict",
+      "query": "IDEMPOTENCY_CONFLICT",
+      "category": "exact_identifier",
+      "relevant_chunk_ids": ["doc-e14e6a30041c-chunk-0001"],
+      "notes": "Exact domain error in the support-facing interface."
+    },
+    {
+      "id": "identifier-requirement-id",
+      "query": "OMS-REF-001",
+      "category": "exact_identifier",
+      "relevant_chunk_ids": ["doc-f69d08d8af4b-chunk-0000"],
+      "notes": "Requirement ID is inherited metadata indexed lexically on the first requirement chunk."
+    },
+    {
+      "id": "event-order-items-refunded",
+      "query": "What is published in the OrderItemsRefunded event and when is it emitted?",
+      "category": "event_driven_behavior",
+      "relevant_chunk_ids": [
+        "doc-e14e6a30041c-chunk-0003",
+        "doc-58fec8cbd5fe-chunk-0008"
+      ],
+      "notes": "The interface defines the payload; architecture defines its place in the flow."
+    },
+    {
+      "id": "support-partial-refund-api",
+      "query": "What API should customer support use for a partial refund?",
+      "category": "api_interface",
+      "relevant_chunk_ids": ["doc-e14e6a30041c-chunk-0001"],
+      "notes": "Known difficult query. Primary evidence is Support Portal to Order Service.",
+      "expected_facts": [
+        {
+          "statement": "The Support Portal calls Order Service with POST /orders/{order_id}/refunds.",
+          "match_any": [
+            ["support portal", "order service", "post /orders/{order_id}/refunds"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "internal-payment-refund-api",
+      "query": "Which internal endpoint does Order Service call to execute the financial refund?",
+      "category": "api_interface",
+      "relevant_chunk_ids": ["doc-e14e6a30041c-chunk-0002"],
+      "notes": "Internal Order Service to Payment Service contract."
+    },
+    {
+      "id": "completed-order-eligibility",
+      "query": "Which order status is eligible for an item-level partial refund?",
+      "category": "business_rule",
+      "relevant_chunk_ids": ["doc-f69d08d8af4b-chunk-0001"],
+      "notes": "Only COMPLETED orders are eligible.",
+      "expected_facts": [
+        {
+          "statement": "Only orders in COMPLETED status are eligible.",
+          "match_any": [["completed", "eligible"]]
+        }
+      ]
+    },
+    {
+      "id": "cumulative-refund-limits",
+      "query": "How are cumulative refunded quantity and amount prevented from exceeding the purchase and capture?",
+      "category": "business_rule",
+      "relevant_chunk_ids": [
+        "doc-f69d08d8af4b-chunk-0000",
+        "doc-f69d08d8af4b-chunk-0001"
+      ],
+      "notes": "Requires the business statement and detailed quantity/amount rules.",
+      "expected_facts": [
+        {
+          "statement": "Refunded quantity cannot exceed purchased quantity.",
+          "match_any": [["quantity", "purchased", "cannot exceed"]]
+        },
+        {
+          "statement": "Total refunded amount cannot exceed the captured amount.",
+          "match_any": [["refunded amount", "captured amount", "cannot exceed"]]
+        }
+      ]
+    },
+    {
+      "id": "shipping-first-release",
+      "query": "Is shipping refunded in the first partial-refund release?",
+      "category": "business_rule",
+      "relevant_chunk_ids": ["doc-f69d08d8af4b-chunk-0001"],
+      "notes": "Shipping is explicitly excluded from the first release."
+    },
+    {
+      "id": "refund-ownership-boundary",
+      "query": "Which service owns refund eligibility and which service owns financial execution?",
+      "category": "ownership",
+      "relevant_chunk_ids": [
+        "doc-58fec8cbd5fe-chunk-0007",
+        "doc-58fec8cbd5fe-chunk-0000",
+        "doc-58fec8cbd5fe-chunk-0001"
+      ],
+      "notes": "Tests the explicit ownership boundary plus the two service descriptions.",
+      "expected_facts": [
+        {
+          "statement": "Order Service owns refund business eligibility.",
+          "match_any": [["order service", "owns", "eligibility"]]
+        },
+        {
+          "statement": "Payment Service owns financial execution.",
+          "match_any": [["payment service", "owns", "financial execution"]]
+        }
+      ]
+    },
+    {
+      "id": "inventory-refund-inputs",
+      "query": "What information does Inventory Service need after a successful item refund?",
+      "category": "event_driven_behavior",
+      "relevant_chunk_ids": [
+        "doc-e14e6a30041c-chunk-0003",
+        "doc-58fec8cbd5fe-chunk-0002",
+        "doc-f69d08d8af4b-chunk-0002"
+      ],
+      "notes": "Covers the event fields, inventory rules, and acceptance criterion.",
+      "expected_facts": [
+        {
+          "statement": "Inventory uses SKU, quantity, and disposition to decide stock adjustment or restocking.",
+          "match_any": [["inventory", "sku", "quantity", "disposition"]]
+        }
+      ]
+    },
+    {
+      "id": "notification-refund-inputs",
+      "query": "What should Notification Service send to the customer after a refund?",
+      "category": "event_driven_behavior",
+      "relevant_chunk_ids": [
+        "doc-e14e6a30041c-chunk-0003",
+        "doc-58fec8cbd5fe-chunk-0003",
+        "doc-f69d08d8af4b-chunk-0002"
+      ],
+      "notes": "Combines notification ownership, event fields, and customer acceptance criteria.",
+      "expected_facts": [
+        {
+          "statement": "The notification includes the order, refunded items, amount, and expected settlement information.",
+          "match_any": [["notification", "order", "items", "amount"]]
+        }
+      ]
+    },
+    {
+      "id": "seven-year-audit-retention",
+      "query": "How long must refund audit history be retained?",
+      "category": "security_audit",
+      "relevant_chunk_ids": [
+        "doc-f69d08d8af4b-chunk-0003",
+        "doc-58fec8cbd5fe-chunk-0007"
+      ],
+      "notes": "Both requirement and architecture specify seven years.",
+      "expected_facts": [
+        {
+          "statement": "Refund audit history is retained for seven years.",
+          "match_any": [["seven years", "audit"]]
+        }
+      ]
+    },
+    {
+      "id": "pii-card-data-constraints",
+      "query": "What PII and payment-card data restrictions apply to refund logs and events?",
+      "category": "security_audit",
+      "relevant_chunk_ids": [
+        "doc-f69d08d8af4b-chunk-0003",
+        "doc-58fec8cbd5fe-chunk-0007",
+        "doc-e14e6a30041c-chunk-0003"
+      ],
+      "notes": "Covers PII logging, tokenized card data, and event exclusions.",
+      "expected_facts": [
+        {
+          "statement": "PII must not appear in application logs or events.",
+          "match_any": [["personally identifiable information", "not", "logs", "events"], ["pii", "not", "logs", "events"]]
+        },
+        {
+          "statement": "Payment credentials or card data are excluded from stored/event content.",
+          "match_any": [["card data", "not stored"], ["payment credentials", "excluded"]]
+        }
+      ]
+    },
+    {
+      "id": "reuse-cancellation-patterns",
+      "query": "What existing design patterns should partial refunds reuse?",
+      "category": "existing_design_reuse",
+      "relevant_chunk_ids": [
+        "doc-41010a673bbe-chunk-0005",
+        "doc-41010a673bbe-chunk-0002"
+      ],
+      "notes": "The existing cancellation SDD names the reusable patterns and explains failure mechanics.",
+      "expected_facts": [
+        {
+          "statement": "Reuse ownership, stable idempotency, pending reconciliation, transactional outbox, immutable audit, and event deduplication patterns.",
+          "match_any": [["idempotency", "reconciliation", "outbox", "audit", "deduplication"]]
+        }
+      ]
+    },
+    {
+      "id": "cancellation-versus-partial-refund",
+      "query": "How does an item-level partial refund differ from cancelling an order?",
+      "category": "multi_evidence",
+      "relevant_chunk_ids": [
+        "doc-41010a673bbe-chunk-0005",
+        "doc-f69d08d8af4b-chunk-0000",
+        "doc-f69d08d8af4b-chunk-0003"
+      ],
+      "notes": "Partial refunds retain completed state and track per-line refundable quantity/value.",
+      "expected_facts": [
+        {
+          "statement": "Partial refunds track refundable quantity and value per order line without changing the completed order to cancelled.",
+          "match_any": [["quantity", "value", "order line", "not", "cancelled"]]
+        }
+      ]
+    },
+    {
+      "id": "at-least-once-event-deduplication",
+      "query": "How do consumers handle duplicate refund-event deliveries?",
+      "category": "event_driven_behavior",
+      "relevant_chunk_ids": [
+        "doc-e14e6a30041c-chunk-0003",
+        "doc-58fec8cbd5fe-chunk-0007",
+        "doc-41010a673bbe-chunk-0002"
+      ],
+      "notes": "At-least-once delivery requires consumer deduplication by event ID."
+    },
+    {
+      "id": "transactional-outbox",
+      "query": "How should the design prevent a committed refund from losing its integration event?",
+      "category": "failure_handling",
+      "relevant_chunk_ids": [
+        "doc-41010a673bbe-chunk-0002",
+        "doc-41010a673bbe-chunk-0005"
+      ],
+      "notes": "The cancellation SDD provides the reusable transactional-outbox pattern."
+    },
+    {
+      "id": "partial-refund-service-flow",
+      "query": "Describe the service interactions from a support refund request through payment, inventory, and notification.",
+      "category": "architecture_relationship",
+      "relevant_chunk_ids": [
+        "doc-58fec8cbd5fe-chunk-0008",
+        "doc-58fec8cbd5fe-chunk-0006",
+        "doc-e14e6a30041c-chunk-0003"
+      ],
+      "notes": "Multi-evidence end-to-end interaction and downstream event behavior."
+    },
+    {
+      "id": "order-database-refund-records",
+      "query": "What refund information will the Order Database eventually need to store?",
+      "category": "architecture_relationship",
+      "relevant_chunk_ids": ["doc-58fec8cbd5fe-chunk-0004"],
+      "notes": "Proposed logical persistence needs; no schema is implemented yet."
+    }
+  ]
+}

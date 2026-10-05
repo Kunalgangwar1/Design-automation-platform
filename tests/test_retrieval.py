@@ -119,6 +119,7 @@ def test_index_rows_map_back_to_deterministic_result_fields() -> None:
         "lexical_rank": None,
         "lexical_score": None,
         "fusion_score": None,
+        "reranker_score": None,
         "origin": RetrievalOrigin.DENSE,
     }
 

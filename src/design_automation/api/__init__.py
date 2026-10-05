@@ -1,2 +1,1 @@
-"""API boundary for future request and response handling."""
-
+"""FastAPI delivery boundary for the design automation application."""

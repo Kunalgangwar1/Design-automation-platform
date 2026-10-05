@@ -24,9 +24,9 @@ def test_expected_data_directories_exist() -> None:
     expected_directories = {
         "requirements",
         "architecture",
+        "evaluation",
         "interfaces",
         "existing_sdds",
     }
 
     assert {path.name for path in DATA_DIR.iterdir() if path.is_dir()} == expected_directories
-

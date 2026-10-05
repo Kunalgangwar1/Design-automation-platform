@@ -84,7 +84,7 @@ def reciprocal_rank_fusion(
                     float(dense_score) if dense_score is not None else None
                 ),
                 metadata=dict(base.metadata),
-                provider=RetrievalProvider.DIAGNOSTIC_RRF,
+                provider=RetrievalProvider.RRF,
                 rank=rank,
                 provider_score=float(item["fusion_score"]),
                 dense_rank=int(dense_rank) if dense_rank is not None else None,

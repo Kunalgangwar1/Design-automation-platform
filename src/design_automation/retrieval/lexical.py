@@ -66,6 +66,14 @@ def _chunk_lexical_text(chunk: DocumentChunk) -> str:
         context.append("API contract")
     if HTTP_ROUTE_PATTERN.search(chunk.text):
         context.append("API endpoint route")
+    # Front-matter is intentionally excluded from retrieval chunks, so index a
+    # few inherited identifiers that remain valuable for exact lookup.
+    for key in ("requirement_id", "document_id", "status"):
+        if key in {"requirement_id", "document_id"} and chunk.chunk_index != 0:
+            continue
+        value = chunk.metadata.get(key)
+        if value:
+            context.append(f"{key}: {value}")
     return "\n".join(context)
 
 

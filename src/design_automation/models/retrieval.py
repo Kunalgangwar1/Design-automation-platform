@@ -5,12 +5,10 @@ from enum import StrEnum
 
 
 class RetrievalMode(StrEnum):
-    """Available canonical and diagnostic retrieval strategies."""
+    """Available local retrieval strategies."""
 
-    FAISS = "faiss"
-    BEDROCK = "bedrock"
+    DENSE = "dense"
     LEXICAL = "lexical"
-    FALLBACK = "fallback"
     HYBRID = "hybrid"
 
 
@@ -18,7 +16,6 @@ class RetrievalOrigin(StrEnum):
     """Local candidate lists that contributed a diagnostic result."""
 
     DENSE = "dense"
-    BEDROCK = "bedrock"
     LEXICAL = "lexical"
     BOTH = "both"
 
@@ -27,9 +24,8 @@ class RetrievalProvider(StrEnum):
     """Provider that produced a retrieval result."""
 
     FAISS = "faiss"
-    BEDROCK_KB = "bedrock_kb"
     BM25 = "bm25"
-    DIAGNOSTIC_RRF = "diagnostic_rrf"
+    RRF = "rrf"
 
 
 @dataclass(frozen=True)
@@ -51,24 +47,20 @@ class RetrievalResult:
     lexical_rank: int | None = None
     lexical_score: float | None = None
     fusion_score: float | None = None
+    reranker_score: float | None = None
     origin: RetrievalOrigin = RetrievalOrigin.DENSE
 
 
 @dataclass(frozen=True)
 class RetrievalResponse:
-    """Results plus the observable decision made by retrieval orchestration."""
+    """Results plus visible candidate settings used for the request."""
 
     requested_mode: RetrievalMode
     path_used: RetrievalMode
     reason: str
     results: list[RetrievalResult]
-    fallback_triggered: bool = False
-    faiss_top_score: float | None = None
-    fallback_threshold: float | None = None
-    final_provider: RetrievalProvider | None = None
-
-    @property
-    def dense_top_score(self) -> float | None:
-        """Backward-compatible name for the local FAISS top score."""
-
-        return self.faiss_top_score
+    final_top_k: int
+    dense_candidate_count: int = 0
+    lexical_candidate_count: int = 0
+    candidate_retrieval_latency_ms: float | None = None
+    reranker_latency_ms: float | None = None

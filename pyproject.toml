@@ -9,11 +9,17 @@ description = "Interview-preparation scaffold for a Solution Design Document aut
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "boto3>=1.35",
     "faiss-cpu>=1.8",
+    "fastapi>=0.115",
+    "google-genai>=1.0",
+    "neo4j>=5.25",
     "numpy>=1.26",
+    "openai>=2.0",
+    "psycopg[binary]>=3.2",
     "rank-bm25>=0.2.2",
     "sentence-transformers>=3.0",
+    "sqlalchemy>=2.0",
+    "uvicorn>=0.30",
 ]
 
 [project.scripts]
@@ -21,7 +27,7 @@ inspect-chunks = "design_automation.ingestion.inspect:main"
 inspect-retrieval = "design_automation.retrieval.inspect:main"
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0"]
+dev = ["httpx>=0.27", "pytest>=8.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -29,3 +35,4 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+markers = ["integration: requires an explicitly enabled external service"]

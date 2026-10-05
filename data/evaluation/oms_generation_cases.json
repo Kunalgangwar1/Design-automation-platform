@@ -1,0 +1,145 @@
+{
+  "dataset_version": 1,
+  "corpus": "dummy-oms-day10",
+  "description": "Human-first generation evaluation definitions grounded only in the existing OMS corpus.",
+  "cases": [
+    {
+      "id": "support-partial-refund-api",
+      "query": "What API should customer support use for a partial refund?",
+      "category": "api_interface",
+      "expected_facts": [
+        {
+          "statement": "The Support Portal calls Order Service with POST /orders/{order_id}/refunds.",
+          "match_any": [["support portal", "order service", "post /orders/{order_id}/refunds"]]
+        }
+      ]
+    },
+    {
+      "id": "refund-ownership-boundary",
+      "query": "Which service owns refund eligibility and which service owns financial execution?",
+      "category": "ownership",
+      "expected_facts": [
+        {
+          "statement": "Order Service owns refund business eligibility.",
+          "match_any": [["order service", "owns", "eligibility"]]
+        },
+        {
+          "statement": "Payment Service owns financial execution.",
+          "match_any": [["payment service", "owns", "financial execution"]]
+        }
+      ]
+    },
+    {
+      "id": "completed-order-eligibility",
+      "query": "Which order status is eligible for an item-level partial refund?",
+      "category": "business_rule",
+      "expected_facts": [
+        {
+          "statement": "Only orders in COMPLETED status are eligible.",
+          "match_any": [["completed", "eligible"]]
+        }
+      ]
+    },
+    {
+      "id": "shipping-first-release",
+      "query": "Is shipping refunded in the first partial-refund release?",
+      "category": "business_rule",
+      "expected_facts": [
+        {
+          "statement": "Shipping is not refunded in the first release.",
+          "match_any": [["shipping", "not refunded", "first release"]]
+        }
+      ]
+    },
+    {
+      "id": "gateway-timeout-reconciliation",
+      "query": "What should happen when the external financial provider does not respond during a refund?",
+      "category": "failure_handling",
+      "expected_facts": [
+        {
+          "statement": "A gateway timeout is ambiguous and produces a retryable or pending result.",
+          "match_any": [["timeout", "ambiguous", "retryable"], ["timeout", "ambiguous", "pending"]]
+        },
+        {
+          "statement": "A gateway timeout must not create an unverified successful refund.",
+          "match_any": [["timeout", "not", "unverified successful refund"], ["timeout", "does not create", "successful refund"]]
+        },
+        {
+          "statement": "Reconciliation uses the stable or original idempotency key.",
+          "match_any": [["original idempotency key", "lookup"], ["stable idempotency key", "reconcil"]]
+        }
+      ]
+    },
+    {
+      "id": "event-order-items-refunded",
+      "query": "What is published in the OrderItemsRefunded event and when is it emitted?",
+      "category": "event_driven_behavior",
+      "expected_facts": [
+        {
+          "statement": "OrderItemsRefunded is published only after payment success is confirmed.",
+          "match_any": [["orderitemsrefunded", "after", "payment success", "confirmed"]]
+        },
+        {
+          "statement": "Inventory Service and Notification Service consume downstream refund information.",
+          "match_any": [["inventory service", "notification service", "consume", "refund"]]
+        }
+      ]
+    },
+    {
+      "id": "inventory-refund-inputs",
+      "query": "What information does Inventory Service need after a successful item refund?",
+      "category": "event_driven_behavior",
+      "expected_facts": [
+        {
+          "statement": "Inventory uses SKU, refunded quantity, and disposition for stock handling.",
+          "match_any": [["inventory", "sku", "quantity", "disposition"]]
+        }
+      ]
+    },
+    {
+      "id": "seven-year-audit-retention",
+      "query": "How long must refund audit history be retained?",
+      "category": "security_audit",
+      "expected_facts": [
+        {
+          "statement": "Refund audit history is retained for seven years.",
+          "match_any": [["seven years", "audit"]]
+        }
+      ]
+    },
+    {
+      "id": "pii-card-data-constraints",
+      "query": "What PII and payment-card data restrictions apply to refund logs and events?",
+      "category": "security_audit",
+      "expected_facts": [
+        {
+          "statement": "PII must not appear in application logs or events.",
+          "match_any": [["pii", "not", "logs", "events"], ["personally identifiable information", "not", "logs", "events"]]
+        },
+        {
+          "statement": "Payment card data or credentials are not stored, logged, or included in events.",
+          "match_any": [["card data", "not", "stored"], ["payment credentials", "excluded", "event"]]
+        }
+      ]
+    },
+    {
+      "id": "cancellation-versus-partial-refund",
+      "query": "How does an item-level partial refund differ from cancelling an order?",
+      "category": "multi_evidence",
+      "expected_facts": [
+        {
+          "statement": "Partial refunds track refundable quantity and value per order line.",
+          "match_any": [["refundable quantity", "value", "order line"]]
+        },
+        {
+          "statement": "A partial refund must not change the completed order to CANCELLED.",
+          "match_any": [["completed order", "not", "cancelled"]]
+        },
+        {
+          "statement": "Partial refunds reuse selected cancellation patterns such as ownership, idempotency, reconciliation, outbox, audit, or deduplication.",
+          "match_any": [["reuse", "cancellation", "idempotency"], ["reuse", "cancellation", "outbox"], ["reuse", "cancellation", "audit"]]
+        }
+      ]
+    }
+  ]
+}
